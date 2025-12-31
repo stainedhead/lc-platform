@@ -1,50 +1,175 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+Version: NEW → 1.0.0 (Initial constitution)
+Modified Principles: N/A (new document)
+Added Sections: All core principles and governance rules
+Removed Sections: N/A
+Templates Requiring Updates:
+  ✅ plan-template.md - Constitution Check section aligned with AGENTS.md reference
+  ✅ spec-template.md - No updates required (requirements-driven, constitution-agnostic)
+  ✅ tasks-template.md - No updates required (follows plan/spec structure)
+Follow-up TODOs: None
+-->
+
+# LC Platform Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. AGENTS.md as Single Source of Truth
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+**AGENTS.md is the authoritative reference for all development rules and product context.**
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+This constitution establishes governance and coordination across the LC Platform ecosystem.
+For detailed development rules, architectural patterns, quality standards, and implementation
+guidelines, refer to:
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+- **Parent Level**: `/AGENTS.md` - Platform-wide principles and cross-package coordination
+- **Package Level**: `{package}/AGENTS.md` - Package-specific implementation rules
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+**Rationale**: Maintaining a single, living document (AGENTS.md) ensures consistency across
+all packages while enabling AI agents to access complete context. This constitution provides
+governance structure, while AGENTS.md provides operational guidance.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### II. Hexagonal Architecture (NON-NEGOTIABLE)
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+**All packages MUST follow Hexagonal Architecture (Ports and Adapters) pattern.**
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+Requirements:
+- Core domain logic MUST be cloud-agnostic and provider-independent
+- Ports (interfaces) MUST define contracts without implementation details
+- Adapters MUST contain all cloud-provider-specific code (AWS, Azure, GCP, Mock)
+- Application code MUST depend on abstractions, never on concrete implementations
+- No cloud SDK types MUST leak into core interfaces or return values
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**Rationale**: Hexagonal architecture enables true cloud portability, vendor independence,
+and testability through mock providers. This is the foundation of the platform's value
+proposition.
+
+### III. Test-Driven Development (NON-NEGOTIABLE)
+
+**Tests MUST be written before implementation begins.**
+
+Requirements:
+- All tests MUST be written first and MUST fail before implementation
+- Minimum 80% code coverage for all public interfaces
+- Unit tests use mock provider (no cloud credentials required)
+- Integration tests use LocalStack (AWS) or Azurite (Azure)
+- Contract tests verify provider parity (AWS ↔ Mock ↔ Azure)
+
+**Rationale**: TDD ensures interface stability, prevents regression, enables rapid
+development without cloud costs, and validates provider abstraction integrity.
+
+### IV. Provider Independence
+
+**No cloud-specific concepts or types in core domain.**
+
+Requirements:
+- Core interfaces MUST use generic, cloud-agnostic terminology
+- Configuration-driven provider selection (environment variables)
+- Mock provider MUST support all interface methods for local development
+- Provider switching MUST require only configuration changes, never code changes
+
+**Rationale**: Provider independence is the core value proposition. Without it, the
+platform offers no advantage over using cloud SDKs directly.
+
+### V. Documentation as Code
+
+**AGENTS.md files MUST be maintained as development rules evolve.**
+
+Requirements:
+- Update parent `AGENTS.md` when platform-wide patterns change
+- Update package `AGENTS.md` when package-specific rules change
+- Documentation updates are part of Definition of Done
+- Changes to architecture MUST be reflected in AGENTS.md before merging
+
+**Rationale**: AGENTS.md provides AI agents and developers with current context. Stale
+documentation leads to inconsistencies and technical debt.
+
+### VI. Quality Gates
+
+**Code quality standards MUST be enforced before commit.**
+
+Requirements (for TypeScript packages):
+- Auto-format code first (`bun run format`) before all commits
+- Zero Critical/High severity linting errors allowed
+- All tests MUST pass before commit
+- Type checking MUST pass without errors (`bun run typecheck`)
+
+**Rationale**: Automated quality gates prevent technical debt and maintain consistent
+code quality across all packages and contributors.
+
+## Cross-Package Coordination
+
+### Package Dependency Management
+
+**Changes affecting multiple packages MUST follow dependency order.**
+
+Process:
+1. Update foundation packages first (`lc-platform-dev-accelerators`)
+2. Update shared packages second (`lc-platform-config`)
+3. Update consumer packages last (`lc-platform-cli`, `lc-platform-rest-api`)
+4. Coordinate version bumps across dependent packages
+5. Integration testing MUST verify cross-package compatibility
+
+**Rationale**: Following dependency order prevents breaking changes and ensures stable
+releases across the platform ecosystem.
+
+### SpecKit Workflow Integration
+
+**All packages MUST use SpecKit for structured development.**
+
+Required commands:
+- `/speckit.specify` - Create/update feature specifications
+- `/speckit.plan` - Generate implementation plans with design artifacts
+- `/speckit.tasks` - Create dependency-ordered tasks
+- `/speckit.implement` - Execute implementations
+- `/speckit.clarify` - Refine underspecified requirements
+- `/speckit.analyze` - Verify cross-artifact consistency
+
+**Rationale**: SpecKit provides consistent, AI-assisted workflow across all packages,
+reduces ambiguity, and ensures thorough planning before implementation.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+### Amendment Process
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**This constitution MUST be updated when governance structure changes.**
+
+To amend this constitution:
+1. Propose changes with clear rationale in pull request
+2. Document impact on AGENTS.md files (parent and packages)
+3. Update version number following semantic versioning rules
+4. Update LAST_AMENDED_DATE to current date
+5. Cascade changes to affected AGENTS.md files
+6. Notify all package maintainers of governance changes
+
+### Versioning Policy
+
+**Constitution versions follow semantic versioning (MAJOR.MINOR.PATCH):**
+
+- **MAJOR**: Backward-incompatible changes (removing/redefining core principles)
+- **MINOR**: New principles added or material expansions to guidance
+- **PATCH**: Clarifications, wording improvements, typo fixes
+
+### Compliance Review
+
+**All development work MUST comply with this constitution and AGENTS.md.**
+
+Verification requirements:
+- PRs MUST reference relevant sections of AGENTS.md for new patterns
+- Architecture reviews MUST verify Hexagonal Architecture compliance
+- Test coverage reports MUST meet 80% threshold
+- Code reviews MUST verify no cloud SDK types in core interfaces
+- Constitution violations MUST be justified and documented in plan.md
+
+### AGENTS.md as Runtime Guidance
+
+**For operational development guidance, always consult AGENTS.md files:**
+
+- **Platform-wide rules**: See parent `/AGENTS.md`
+- **Package-specific rules**: See `{package}/AGENTS.md`
+- **When in conflict**: Package-specific rules take precedence within that package
+
+This constitution defines what MUST be true; AGENTS.md defines how to achieve it.
+
+**Version**: 1.0.0 | **Ratified**: 2025-12-31 | **Last Amended**: 2025-12-31
