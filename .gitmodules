@@ -1,0 +1,14 @@
+[submodule "lc-platform-dev-accelerators"]
+	path = lc-platform-dev-accelerators
+	url = https://github.com/stainedhead/lc-platform-dev-accelerators.git
+	branch = main
+
+[submodule "lc-platform-dev-cli"]
+	path = lc-platform-dev-cli
+	url = https://github.com/stainedhead/lc-platform-dev-cli.git
+	branch = main
+
+[submodule "lc-platform-processing-lib"]
+	path = lc-platform-processing-lib
+	url = https://github.com/stainedhead/lc-platform-processing-lib.git
+	branch = main

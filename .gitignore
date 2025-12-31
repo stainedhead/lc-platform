@@ -1,5 +1,5 @@
-# Package Directories (maintained as standalone repos)
-lc-platform-*/
+# Package Directories (maintained as standalone repos via git submodules)
+# lc-platform-*/ directories are now tracked as submodules (see .gitmodules)
 
 # Node modules
 node_modules/
